@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// HARDCODED FOR TESTING
+// HARDCODED BACKEND URL
 const API_URL = 'https://govt-scheme-finder-backend.onrender.com/api';
 
 const api = axios.create({
@@ -10,28 +10,39 @@ const api = axios.create({
   },
 });
 
-// Add JWT token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// JWT token interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
+// Auth API
 export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
   login: (credentials) => api.post('/auth/login', credentials),
-  googleAuth: () => (window.location.href = `${API_URL}/auth/google`),
+  googleAuth: () => {
+    window.location.href = `${API_URL}/auth/google`;
+  },
 };
 
+// Scheme API
 export const schemeAPI = {
   getAllSchemes: (params) => api.get('/schemes', { params }),
   getSchemeById: (id) => api.get(`/schemes/${id}`),
   getEligibleSchemes: () => api.get('/schemes/user/eligible'),
-  compareSchemes: (schemeId1, schemeId2) => api.post('/schemes/compare', { schemeId1, schemeId2 }),
+  compareSchemes: (schemeId1, schemeId2) => 
+    api.post('/schemes/compare', { schemeId1, schemeId2 }),
 };
 
+// User API
 export const userAPI = {
   getProfile: () => api.get('/user/profile'),
   updateProfile: (data) => api.put('/user/profile', data),
