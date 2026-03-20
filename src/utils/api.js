@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// HARDCODED BACKEND URL
-const API_URL = 'https://govt-scheme-finder-backend.onrender.com/api';
+// Use environment variable
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+console.log('🔗 API URL:', API_URL); // Debug
 
 const api = axios.create({
   baseURL: API_URL,
