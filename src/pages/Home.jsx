@@ -11,7 +11,37 @@ import {
   Send,
   ChevronLeft
 } from 'lucide-react';
+import { getChatbotResponse } from '../services/chatbotService';
 
+// Inside Home component, update handleSendMessage:
+
+const handleSendMessage = async () => {
+  if (!inputMessage.trim()) return;
+
+  // Add user message
+  const userMsg = inputMessage;
+  setMessages(prev => [...prev, { type: 'user', text: userMsg }]);
+  setInputMessage('');
+
+  // Show typing indicator
+  setMessages(prev => [...prev, { type: 'bot', text: 'Typing...', isTyping: true }]);
+
+  try {
+    // Get AI response
+    const botResponse = await getChatbotResponse(userMsg);
+    
+    // Remove typing indicator and add real response
+    setMessages(prev => prev.filter(m => !m.isTyping).concat({
+      type: 'bot',
+      text: botResponse
+    }));
+  } catch (error) {
+    setMessages(prev => prev.filter(m => !m.isTyping).concat({
+      type: 'bot',
+      text: "Sorry, I couldn't process that. Can you ask about specific schemes?"
+    }));
+  }
+};
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
